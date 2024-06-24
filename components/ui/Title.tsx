@@ -1,6 +1,6 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import Colors from '../constants/colors.ts';
+import {StyleSheet, Text} from 'react-native';
+import Colors from '../../constants/colors.ts';
 
 type TitleProps = {
     children: string
@@ -18,7 +18,10 @@ const styles = StyleSheet.create({
         color: Colors.black,
         textAlign: 'center',
         borderWidth: 2,
-        padding: 12
+        padding: 12,
+        marginTop: 24,
+        maxWidth: '80%',
+        width: 300
     }
 });
 

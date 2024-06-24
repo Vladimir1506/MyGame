@@ -1,118 +1,70 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useState} from 'react';
+import {ImageBackground, SafeAreaView, StyleSheet} from 'react-native';
+import StartGameScreen from './screens/StartGameScreen.tsx';
+import LinearGradient from 'react-native-linear-gradient';
+import GameScreen from './screens/GameScreen.tsx';
+import Colors from './constants/colors.ts';
+import GameOverScreen from './screens/GameOverScreen.tsx';
+import Sound from 'react-native-sound';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const playSound = () => {
+    const ding = new Sound('the_end.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+            console.log('failed to load the sound', error);
+            return;
+        }
+        ding.setVolume(0.1)
+        ding.play()
+    });
+}
+const App = () => {
+    const [pickedNumber, setPickedNumber] = useState<number>()
+    const [roundsNumber, setRoundsNumber] = useState<number>(0)
+    const [isGameOver, setIsGameOver] = useState<boolean>(true)
+    const pickNumberHandler = (num: number) => {
+        setPickedNumber(num)
+        setIsGameOver(false)
+    }
+    const onGameOver = (roundsNumber: number) => {
+        setIsGameOver(true)
+        setRoundsNumber(roundsNumber)
+        playSound()
+    }
+    const startNewGameHandler = () => {
+        setPickedNumber(undefined)
+        setRoundsNumber(0)
+        setIsGameOver(true)
+    }
+    let screen = <StartGameScreen pickNumber={pickNumberHandler}/>
+    if (pickedNumber) screen = isGameOver ?
+        <GameOverScreen pickedNumber={pickedNumber} roundsNumber={roundsNumber} onStartNewGame={startNewGameHandler}/> :
+        <GameScreen userNumber={pickedNumber} gameOverHandler={onGameOver}/>
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+    return (
+        <LinearGradient
+            // colors={['#4e0329', '#ddb52f']}
+            colors={[Colors.white, Colors.black]}
+            style={styles.rootScreen}>
+            <ImageBackground source={require('./assets/images/dices.jpg')}
+                             resizeMode={'cover'}
+                             style={styles.rootScreen}
+                             imageStyle={styles.backgroundImage}>
+                <SafeAreaView style={styles.rootScreen}>
+                    {screen}
+                </SafeAreaView>
+            </ImageBackground>
+        </LinearGradient>
+    );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+    rootScreen: {
+        flex: 1
+    },
+    backgroundImage: {
+        opacity: 0.2
+    }
 });
 
 export default App;
